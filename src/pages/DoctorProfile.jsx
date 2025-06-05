@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+// Correct relative import path
+import DoctorArticleForm from "../components/DoctorArticleForm";
 
 const apiBaseUrl = import.meta.env.VITE_API_BASE_URL;
 
@@ -31,6 +33,8 @@ const DoctorProfile = () => {
       try {
         const res = await axios.get(`${apiBaseUrl}/api/doctor/${email}`);
         setDoctor(res.data);
+              localStorage.setItem("userName", res.data.name || "");
+
         setLoading(false);
       } catch (err) {
         setError("Failed to fetch doctor profile.");
@@ -70,7 +74,12 @@ const DoctorProfile = () => {
           </div>
         </div>
       )}
+      <div>
+      {/* Your DoctorProfile JSX here */}
+      <DoctorArticleForm />
     </div>
+    </div>
+    
   );
 };
 
