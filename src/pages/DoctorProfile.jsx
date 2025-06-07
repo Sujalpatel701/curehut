@@ -3,6 +3,7 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 // Correct relative import path
 import DoctorArticleForm from "../components/DoctorArticleForm";
+import DoctorAppointmentForm from "../components/DoctorAppointmentForm";
 
 const apiBaseUrl = import.meta.env.VITE_API_BASE_URL;
 
@@ -78,6 +79,9 @@ const DoctorProfile = () => {
       {/* Your DoctorProfile JSX here */}
       <DoctorArticleForm />
     </div>
+      <div>
+        <DoctorAppointmentForm />
+            </div>
     </div>
     
   );

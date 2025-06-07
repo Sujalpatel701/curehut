@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { useNavigate, Link } from "react-router-dom";
+import AvailableAppointments from "../components/AvailableAppointments";
 
 const apiBaseUrl = import.meta.env.VITE_API_BASE_URL;
 
@@ -112,6 +113,9 @@ const UserProfile = () => {
           ))
         )}
       </div>
+      <div>
+        <AvailableAppointments />
+</div>
     </div>
   );
 };
