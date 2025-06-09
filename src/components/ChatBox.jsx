@@ -1,13 +1,14 @@
 import React, { useState } from "react";
 import axios from "axios";
 import ReactMarkdown from "react-markdown";
+import "./ChatBox.css";
 
 const ChatBox = () => {
   const [question, setQuestion] = useState("");
   const [answer, setAnswer] = useState("");
   const [loading, setLoading] = useState(false);
 
-  const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;  // use env variable
+  const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
   const isHealthRelated = (input) => {
     const keywords = [
@@ -37,57 +38,24 @@ const ChatBox = () => {
   };
 
   return (
-    <div style={styles.container}>
-      <h1 style={styles.heading}>CureHut AI – Ask a Health Question</h1>
+    <div className="chatbox-container">
+      <h2 className="chatbox-heading">CureCare AI – Ask a Health Question</h2>
       <textarea
+        className="chatbox-textarea"
         rows={4}
-        style={styles.textarea}
         value={question}
         onChange={(e) => setQuestion(e.target.value)}
         placeholder="Ask something about health, diseases, remedies..."
       />
-      <button onClick={handleAsk} style={styles.button}>
+      <button onClick={handleAsk} className="chatbox-button">
         {loading ? "Thinking..." : "Ask Gemini"}
       </button>
-      <div style={styles.answer}>
+      <div className="chatbox-answer">
         <strong>Answer:</strong>
-        <div style={{ marginTop: 10 }}>
-          <ReactMarkdown>{answer}</ReactMarkdown>
-        </div>
+        <ReactMarkdown>{answer}</ReactMarkdown>
       </div>
     </div>
   );
-};
-
-const styles = {
-  container: {
-    maxWidth: "700px",
-    margin: "40px auto",
-    padding: "20px",
-    textAlign: "center",
-    background: "#f8f8f8",
-    borderRadius: "10px",
-    boxShadow: "0 0 10px rgba(0,0,0,0.1)",
-  },
-  heading: {
-    marginBottom: "20px",
-  },
-  textarea: {
-    width: "100%",
-    padding: "10px",
-    fontSize: "16px",
-    resize: "vertical",
-  },
-  button: {
-    marginTop: "10px",
-    padding: "10px 20px",
-    fontSize: "16px",
-    cursor: "pointer",
-  },
-  answer: {
-    marginTop: "20px",
-    textAlign: "left",
-  },
 };
 
 export default ChatBox;

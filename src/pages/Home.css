@@ -1,0 +1,50 @@
+/* Make the whole page background slightly darker and full height */
+body {
+  background: #e0ebff; /* soft medical blue */
+  min-height: 100vh;
+  margin: 0;
+  font-family: "Segoe UI", sans-serif;
+}
+
+.home-container {
+  padding: 3rem 1rem;
+  max-width: 1200px;
+  margin: 0 auto;
+  background: linear-gradient(to bottom, #d0e0ff 0%, #f0f4ff 100%);
+  border-radius: 12px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+  margin-top: 40px;
+  margin-bottom: 40px;
+  min-height: calc(100vh - 160px); /* adjust for header+footer */
+}
+
+.home-container h1 {
+  font-size: 3rem;
+  font-weight: 700;
+  color: #002a66; /* deeper blue */
+  margin-bottom: 1rem;
+}
+
+.home-container p {
+  font-size: 1.3rem;
+  color: #333;
+  max-width: 800px;
+  margin: 0 auto 2rem auto;
+  line-height: 1.7;
+}
+
+/* Remove button styles if you’re not using them anymore */
+.home-buttons {
+  display: none;
+}
+
+@media (max-width: 400px) {
+  .home-container h1 {
+    font-size: 2.2rem;
+  }
+
+  .home-container p {
+    font-size: 1.1rem;
+    padding: 0 1rem;
+  }
+}
