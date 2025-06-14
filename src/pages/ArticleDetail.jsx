@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import axios from "axios";
+import Header from "../components/Header";
+import "./ArticleDetail.css";
 
 const apiBaseUrl = import.meta.env.VITE_API_BASE_URL;
 
@@ -12,7 +14,8 @@ const ArticleDetail = () => {
   const [stars, setStars] = useState(5);
   const [message, setMessage] = useState("");
   const [replyText, setReplyText] = useState({});
-  const [replyingTo, setReplyingTo] = useState(null);
+  const [expandedReplies, setExpandedReplies] = useState({});
+  const [selectedImage, setSelectedImage] = useState(null);
 
   const email = localStorage.getItem("userEmail") || "";
   const name = localStorage.getItem("userName") || "";
@@ -76,127 +79,142 @@ const ArticleDetail = () => {
         text: replyText[commentId],
       });
       setReplyText({ ...replyText, [commentId]: "" });
-      setReplyingTo(null);
       fetchComments();
     } catch (err) {
       console.error("Error posting reply:", err);
     }
   };
 
+  const toggleReplies = (commentId) => {
+    setExpandedReplies((prev) => ({
+      ...prev,
+      [commentId]: !prev[commentId],
+    }));
+  };
+
   if (!article) return <p>Loading...</p>;
 
   return (
-    <div style={{ maxWidth: 700, margin: "auto", padding: 20 }}>
-      <h2>{article.title}</h2>
-      <p><strong>Doctor:</strong> {article.doctorEmail}</p>
-      <p><strong>Posted:</strong> {new Date(article.createdAt).toLocaleDateString()}</p>
-      <p>{article.content}</p>
+    <>
+      <Header />
+      <div className="article-detail-container">
+        <h2>{article.title}</h2>
+        <p><strong>Doctor:</strong> {article.doctorEmail}</p>
+        <p><strong>Posted:</strong> {new Date(article.createdAt).toLocaleDateString()}</p>
+        <p>{article.content}</p>
 
-      {article.images?.map((img, i) => (
-        <img
-          key={i}
-          src={`${apiBaseUrl}/uploads/${img}`}
-          alt=""
-          style={{ maxWidth: "100%", marginTop: 10 }}
-        />
-      ))}
+        <div className="article-image-grid">
+          {article.images?.map((img, i) => (
+            <img
+              key={i}
+              src={`${apiBaseUrl}/uploads/${img}`}
+              alt={`Article ${i}`}
+              className="article-grid-image"
+              onClick={() => setSelectedImage(`${apiBaseUrl}/uploads/${img}`)}
+            />
+          ))}
+        </div>
 
-      <hr />
-      <h3>Leave a Comment</h3>
-      {message && <p style={{ color: "green" }}>{message}</p>}
-      <form onSubmit={handleCommentSubmit}>
-        <textarea
-          placeholder="Write your comment"
-          value={text}
-          onChange={(e) => setText(e.target.value)}
-          required
-          rows={4}
-          style={{ width: "100%", padding: 10 }}
-        />
-        <br />
-        <label>
-          Rating:
-          <select
-            value={stars}
-            onChange={(e) => setStars(parseInt(e.target.value))}
-            style={{ marginLeft: 8 }}
-          >
-            {[1, 2, 3, 4, 5].map((s) => (
-              <option key={s} value={s}>{s} Star</option>
-            ))}
-          </select>
-        </label>
-        <br />
-        <button type="submit" style={{ marginTop: 10 }}>Submit</button>
-      </form>
+        <hr />
+        <h3>Leave a Comment</h3>
+        {message && <p style={{ color: "green" }}>{message}</p>}
+        <form onSubmit={handleCommentSubmit}>
+          <textarea
+            placeholder="Write your comment"
+            value={text}
+            onChange={(e) => setText(e.target.value)}
+            required
+            rows={4}
+            style={{ width: "100%", padding: 10 }}
+          />
+          <br />
+          <label>
+            Rating:
+            <select
+              value={stars}
+              onChange={(e) => setStars(parseInt(e.target.value))}
+              style={{ marginLeft: 8 }}
+            >
+              {[1, 2, 3, 4, 5].map((s) => (
+                <option key={s} value={s}>{s} Star</option>
+              ))}
+            </select>
+          </label>
+          <br />
+          <button type="submit" style={{ marginTop: 10 }}>Submit</button>
+        </form>
 
-      <hr />
-      <h3>Comments</h3>
-      {comments.length === 0 ? (
-        <p>No comments yet.</p>
-      ) : (
-        comments.map((c, i) => (
-          <div key={i} style={{ border: "1px solid #ddd", padding: 10, marginTop: 10 }}>
-            <p><strong>{c.name}</strong> ({c.email}) - {c.stars} ⭐</p>
-            <p>{c.text}</p>
-            <p style={{ fontSize: 12, color: "#888" }}>
-              {new Date(c.createdAt).toLocaleString()}
-            </p>
+        <hr />
+        <h3>Comments</h3>
+        {comments.length === 0 ? (
+          <p>No comments yet.</p>
+        ) : (
+          comments.map((c, i) => (
+            <div key={i} className="comment-box">
+              <p><strong>{c.name}</strong> ({c.email}) - {c.stars} ⭐</p>
+              <p>{c.text}</p>
+              <p className="comment-meta">{new Date(c.createdAt).toLocaleString()}</p>
 
-            {/* Replies */}
-            {c.replies?.length > 0 && (
-              <div style={{ marginTop: 10, paddingLeft: 20 }}>
-                <strong>Replies:</strong>
-                {c.replies.map((r, j) => (
-                  <div
-                    key={j}
-                    style={{
-                      marginTop: 5,
-                      borderLeft: "2px solid #ccc",
-                      paddingLeft: 10,
-                    }}
-                  >
-                    <p><strong>{r.name}</strong> ({r.email})</p>
-                    <p>{r.text}</p>
-                    <p style={{ fontSize: 12, color: "#666" }}>
-                      {new Date(r.createdAt).toLocaleString()}
-                    </p>
-                  </div>
-                ))}
-              </div>
-            )}
-
-            {/* Reply Form */}
-            {replyingTo === c._id ? (
-              <form onSubmit={(e) => handleReplySubmit(e, c._id)} style={{ marginTop: 10 }}>
-                <textarea
-                  placeholder="Write your reply"
-                  value={replyText[c._id] || ""}
-                  onChange={(e) =>
-                    setReplyText({ ...replyText, [c._id]: e.target.value })
-                  }
-                  required
-                  rows={2}
-                  style={{ width: "100%", padding: 8 }}
-                />
-                <button type="submit" style={{ marginTop: 5 }}>Reply</button>
+              {c.replies?.length > 0 && (
                 <button
-                  type="button"
-                  onClick={() => setReplyingTo(null)}
-                  style={{ marginLeft: 10 }}
+                  className="toggle-replies"
+                  onClick={() => toggleReplies(c._id)}
                 >
-                  Cancel
+                  {expandedReplies[c._id] ? "Hide Replies" : `Show Replies (${c.replies.length})`}
                 </button>
-              </form>
-            ) : (
-              <button onClick={() => setReplyingTo(c._id)} style={{ marginTop: 10 }}>
+              )}
+
+              <button
+                className="reply-button"
+                onClick={() =>
+                  setExpandedReplies((prev) => ({ ...prev, [c._id]: true }))
+                }
+              >
                 Reply
               </button>
-            )}
+
+              {expandedReplies[c._id] && (
+                <div className="reply-dropdown">
+                  {c.replies?.length > 0 &&
+                    c.replies.map((r, j) => (
+                      <div key={j} className="reply-box">
+                        <p><strong>{r.name}</strong> ({r.email})</p>
+                        <p>{r.text}</p>
+                        <p className="comment-meta">{new Date(r.createdAt).toLocaleString()}</p>
+                      </div>
+                    ))}
+
+                  <form
+                    onSubmit={(e) => handleReplySubmit(e, c._id)}
+                    className="reply-form"
+                  >
+                    <textarea
+                      placeholder="Write your reply"
+                      value={replyText[c._id] || ""}
+                      onChange={(e) =>
+                        setReplyText({ ...replyText, [c._id]: e.target.value })
+                      }
+                      required
+                      rows={2}
+                    />
+                    <button type="submit">Reply</button>
+                  </form>
+                </div>
+              )}
+            </div>
+          ))
+        )}
+
+        {selectedImage && (
+          <div className="image-modal" onClick={() => setSelectedImage(null)}>
+            <div className="image-modal-content" onClick={(e) => e.stopPropagation()}>
+              <img src={selectedImage} alt="Enlarged" />
+              <button className="close-modal" onClick={() => setSelectedImage(null)}>X</button>
+            </div>
           </div>
-        ))
-      )}
-    </div>
+        )}
+      </div>
+    </>
   );
 };
 

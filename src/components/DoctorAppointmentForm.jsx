@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
+import "./CreateAppointmentForm.css";
 
 const apiBaseUrl = import.meta.env.VITE_API_BASE_URL;
 
@@ -13,7 +14,6 @@ const CreateAppointmentForm = () => {
   const [price, setPrice] = useState("");
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
-
   const [appointments, setAppointments] = useState([]);
 
   const doctorEmail = localStorage.getItem("userEmail");
@@ -29,7 +29,6 @@ const CreateAppointmentForm = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
     if (!date || !startTime || !endTime || !price) {
       setError("All fields are required.");
       return;
@@ -52,7 +51,7 @@ const CreateAppointmentForm = () => {
       setStartTime(null);
       setEndTime(null);
       setPrice("");
-      fetchAppointments(); // Refresh the list
+      fetchAppointments();
     } catch (err) {
       setError(err.response?.data?.message || "Error creating appointment");
       setMessage("");
@@ -75,12 +74,12 @@ const CreateAppointmentForm = () => {
   }, [doctorEmail]);
 
   return (
-    <div style={containerStyle}>
+    <div className="create-appointment-container">
       <h3>Create Available Appointment Slot</h3>
-      {message && <p style={{ color: "green" }}>{message}</p>}
-      {error && <p style={{ color: "red" }}>{error}</p>}
+      {message && <p className="success-message">{message}</p>}
+      {error && <p className="error-message">{error}</p>}
 
-      <form onSubmit={handleSubmit} style={formStyle}>
+      <form onSubmit={handleSubmit} className="create-appointment-form">
         <label>
           Date:
           <DatePicker
@@ -140,62 +139,27 @@ const CreateAppointmentForm = () => {
           />
         </label>
 
-        <button type="submit" style={buttonStyle}>Create Appointment</button>
+        <button type="submit">Create Appointment</button>
       </form>
 
-      <h3 style={{ marginTop: "40px" }}>Booked Appointments</h3>
-      {appointments.length === 0 ? (
-        <p>No booked appointments yet.</p>
-      ) : (
-        <ul style={listStyle}>
-          {appointments.map((apt) => (
-            <li key={apt._id} style={listItemStyle}>
-              <strong>{apt.bookedBy?.name}</strong> ({apt.bookedBy?.email})<br />
-              <span>{apt.date} | {apt.day} | {apt.timeSlot}</span><br />
-              <span>Charge: ₹{apt.price}</span>
-            </li>
-          ))}
-        </ul>
-      )}
+      <div className="booked-appointments">
+        <h3>Booked Appointments</h3>
+        {appointments.length === 0 ? (
+          <p>No booked appointments yet.</p>
+        ) : (
+          <ul>
+            {appointments.map((apt) => (
+              <li key={apt._id}>
+                <strong>{apt.bookedBy?.name}</strong> ({apt.bookedBy?.email})<br />
+                {apt.date} | {apt.day} | {apt.timeSlot}<br />
+                Charge: ₹{apt.price}
+              </li>
+            ))}
+          </ul>
+        )}
+      </div>
     </div>
   );
-};
-
-// Styles
-const containerStyle = {
-  marginTop: 40,
-  padding: 20,
-  border: "1px solid #ddd",
-  borderRadius: 6,
-  fontFamily: "Arial, sans-serif",
-};
-
-const formStyle = {
-  display: "flex",
-  flexDirection: "column",
-  gap: 15,
-};
-
-const buttonStyle = {
-  padding: "10px 20px",
-  backgroundColor: "#28a745",
-  color: "white",
-  border: "none",
-  borderRadius: 4,
-  cursor: "pointer",
-};
-
-const listStyle = {
-  listStyleType: "none",
-  paddingLeft: 0,
-};
-
-const listItemStyle = {
-  marginBottom: 15,
-  padding: 10,
-  border: "1px solid #ccc",
-  borderRadius: 5,
-  backgroundColor: "#f9f9f9",
 };
 
 export default CreateAppointmentForm;

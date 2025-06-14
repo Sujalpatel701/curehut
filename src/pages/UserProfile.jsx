@@ -1,15 +1,15 @@
+// src/pages/UserProfile.jsx
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import { useNavigate, Link } from "react-router-dom";
-import AvailableAppointments from "../components/AvailableAppointments";
+import { useNavigate } from "react-router-dom";
 import Header from "../components/Header";
-import "./UserProfile.css"; // Import the CSS file
+import BookedAppointments from "../components/BookedAppointments";
+import "./UserProfile.css";
 
 const apiBaseUrl = import.meta.env.VITE_API_BASE_URL;
 
 const UserProfile = () => {
   const [user, setUser] = useState(null);
-  const [articles, setArticles] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const navigate = useNavigate();
@@ -22,7 +22,7 @@ const UserProfile = () => {
   };
 
   useEffect(() => {
-    const fetchUserAndArticles = async () => {
+    const fetchUser = async () => {
       const token = localStorage.getItem("token");
       const userEmail = localStorage.getItem("userEmail");
 
@@ -47,18 +47,15 @@ const UserProfile = () => {
 
         localStorage.setItem("userName", currentUser.name || "");
         setUser(currentUser);
-
-        const articlesRes = await axios.get(`${apiBaseUrl}/api/articles`);
-        setArticles(articlesRes.data.articles || []);
       } catch (err) {
         console.error(err);
-        setError("Failed to load data.");
+        setError("Failed to load user data.");
       } finally {
         setLoading(false);
       }
     };
 
-    fetchUserAndArticles();
+    fetchUser();
   }, [navigate]);
 
   if (loading) return <div className="loading-message">Loading...</div>;
@@ -85,41 +82,8 @@ const UserProfile = () => {
           </div>
         )}
 
-        <div className="articles-section">
-          <h3>Articles from Doctors</h3>
-          {articles.length === 0 ? (
-            <p className="no-articles">No articles available.</p>
-          ) : (
-            articles.map((article, index) => (
-              <Link
-                to={`/article/${article._id}`}
-                key={index}
-                style={{ textDecoration: "none", color: "inherit" }}
-              >
-                <div className="article-card">
-                  <h4>{article.title}</h4>
-                  <p>{article.content.slice(0, 150)}...</p>
-                  <small>Doctor: {article.doctorEmail}</small>
-                  <small>Posted on: {new Date(article.createdAt).toLocaleDateString()}</small>
-
-                  {article.images?.length > 0 && (
-                    <div className="image-gallery">
-                      {article.images.map((img, i) => (
-                        <img
-                          key={i}
-                          src={`${apiBaseUrl}/uploads/${img}`}
-                          alt="article"
-                        />
-                      ))}
-                    </div>
-                  )}
-                </div>
-              </Link>
-            ))
-          )}
-        </div>
         <div className="appointments-section">
-          <AvailableAppointments />
+          <BookedAppointments />
         </div>
       </div>
     </>

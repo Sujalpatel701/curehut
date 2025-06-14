@@ -4,7 +4,9 @@ import AuthPage from "./pages/AuthPage";
 import UserProfile from "./pages/UserProfile";
 import DoctorProfile from "./pages/DoctorProfile";
 import ArticleDetail from "./pages/ArticleDetail";
-import Home from "./pages/Home"; // <-- Add this
+import ArticlesPage from "./pages/ArticlesPage";
+import AppointmentsPage from "./pages/AppointmentsPage";
+import Home from "./pages/Home";
 
 function App() {
   return (
@@ -15,6 +17,8 @@ function App() {
         <Route path="/profile" element={<UserProfile />} />
         <Route path="/doctor-profile" element={<DoctorProfile />} />
         <Route path="/article/:id" element={<ArticleDetail />} />
+        <Route path="/articles" element={<ArticlesPage />} />
+        <Route path="/appointments" element={<AppointmentsPage />} />
       </Routes>
     </HashRouter>
   );

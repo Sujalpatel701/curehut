@@ -1,0 +1,9 @@
+/* AppointmentsPage.css */
+.appointments-page-container {
+  padding: 20px;
+}
+
+.appointments-page-container h2 {
+  font-size: 24px;
+  margin-bottom: 20px;
+}
